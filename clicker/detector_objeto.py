@@ -2,11 +2,12 @@ import pyautogui
 import cv2
 import numpy as np
 import time
-import keyboard  # Para manejar la entrada del teclado
-import setproctitle  # Para establecer el nombre del proceso
+import keyboard
+import setproctitle
 
 # Establece el nombre del proceso
 setproctitle.setproctitle("word.exe")
+
 
 # Función para encontrar el objeto de mayor tamaño en movimiento en la pantalla
 def encontrar_objeto_mayor_movimiento():
@@ -47,18 +48,21 @@ def encontrar_objeto_mayor_movimiento():
             return None
 
         # Espera para reducir la carga de la CPU
-        time.sleep(0.1)
+        time.sleep(0.02)
+
 
 # Función para hacer clic en la pantalla en las coordenadas dadas
 def hacer_click(x, y):
     pyautogui.click(x, y)
+
 
 # Función para esperar hasta que se presione una tecla específica
 def esperar_tecla(tecla):
     while True:
         if keyboard.is_pressed(tecla):
             return True
-        time.sleep(0.1)
+        time.sleep(0.05)
+
 
 # Función para ejecutar el programa en pantalla completa
 def ejecutar_en_pantalla_completa():
@@ -67,33 +71,45 @@ def ejecutar_en_pantalla_completa():
 
     # Configura la pantalla completa
     pyautogui.FAILSAFE = False  # Desactiva la función de seguridad de PyAutoGUI
-    pyautogui.PAUSE = 0.1  # Breve pausa entre operaciones de PyAutoGUI
+    pyautogui.PAUSE = 0.05  # Breve pausa entre operaciones de PyAutoGUI
+
+    paused = False
 
     try:
-        # Mientras no se presione la tecla 'q', sigue ejecutando
-        while not keyboard.is_pressed('q'):
-            coordenadas = encontrar_objeto_mayor_movimiento()
-            if coordenadas:
-                x, y, w, h = coordenadas
-                centro_x = x + w // 2
-                centro_y = y + h // 2
-                hacer_click(centro_x, centro_y)
-                print(f"Se hizo clic en las coordenadas ({centro_x}, {centro_y})")
-            else:
-                print("No se encontró ningún objeto en movimiento después de 10 segundos.")
+        while True:
+            if keyboard.is_pressed('j'):
+                paused = True
+                print("Programa pausado. Presiona 'j' para continuar.")
 
-            # Espera 1 segundo antes de buscar de nuevo
-            time.sleep(0.2)
+            if paused:
+                esperar_tecla('k')
+                paused = False
+                print("Programa reanudado.")
+
+            if not paused:
+                coordenadas = encontrar_objeto_mayor_movimiento()
+                if coordenadas:
+                    x, y, w, h = coordenadas
+                    centro_x = x + w // 2
+                    centro_y = y + h // 2
+                    hacer_click(centro_x, centro_y)
+                    print(f"Se hizo clic en las coordenadas ({centro_x}, {centro_y})")
+                else:
+                    print("No se encontró ningún objeto en movimiento después de 10 segundos.")
+
+                # Espera
+                time.sleep(0.02)
     except KeyboardInterrupt:
         pass  # Captura la excepción de interrupción de teclado (Ctrl+C)
 
     print("Programa detenido.")
 
+
 # Ejemplo de uso
 if __name__ == "__main__":
-    # Espera hasta que se presione la tecla 's' para comenzar
-    print("Presiona 's' para comenzar...")
-    esperar_tecla('s')
+    # Espera hasta que se presione la tecla 'k' para comenzar
+    print("Presiona 'k' para comenzar...")
+    esperar_tecla('k')
 
     # Ejecuta en pantalla completa
     ejecutar_en_pantalla_completa()
