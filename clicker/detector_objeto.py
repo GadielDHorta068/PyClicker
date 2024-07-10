@@ -8,9 +8,6 @@ import setproctitle
 # Establece el nombre del proceso
 setproctitle.setproctitle("word.exe")
 
-# Definir la resolución personalizada
-ancho_personalizado = 900
-alto_personalizado = 900
 
 # Función para encontrar el objeto de mayor tamaño en movimiento en la pantalla
 def encontrar_objeto_mayor_movimiento():
@@ -18,7 +15,7 @@ def encontrar_objeto_mayor_movimiento():
 
     while True:
         # Captura una imagen de la pantalla
-        imagen = pyautogui.screenshot(region=(0, 0, ancho_personalizado, alto_personalizado))
+        imagen = pyautogui.screenshot()
 
         # Convierte la imagen a formato OpenCV (BGR)
         frame_actual = cv2.cvtColor(np.array(imagen), cv2.COLOR_RGB2BGR)
@@ -69,6 +66,9 @@ def esperar_tecla(tecla):
 
 # Función para ejecutar el programa en pantalla completa
 def ejecutar_en_pantalla_completa():
+    # Obtiene las dimensiones de la pantalla
+    ancho, alto = pyautogui.size()
+
     # Configura la pantalla completa
     pyautogui.FAILSAFE = False  # Desactiva la función de seguridad de PyAutoGUI
     pyautogui.PAUSE = 0.05  # Breve pausa entre operaciones de PyAutoGUI
@@ -77,10 +77,14 @@ def ejecutar_en_pantalla_completa():
 
     try:
         while True:
-            if keyboard.is_pressed('k'):
-                paused = not paused
-                estado = "pausado" if paused else "reanudado"
-                print(f"Programa {estado}. Presiona 'k' para cambiar estado.")
+            if keyboard.is_pressed('j'):
+                paused = True
+                print("Programa pausado. Presiona 'j' para continuar.")
+
+            if paused:
+                esperar_tecla('k')
+                paused = False
+                print("Programa reanudado.")
 
             if not paused:
                 coordenadas = encontrar_objeto_mayor_movimiento()
